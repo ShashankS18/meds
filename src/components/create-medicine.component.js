@@ -2,6 +2,18 @@ import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
+import Select, { createFilter } from 'react-select';
+
+const options = [
+  { value: 'Shashank', label: 'Shashank' },
+  { value: 'Shreyansh', label: 'Shreyansh' },
+  { value: 'Rohan', label: 'Rohan' },
+  { value: 'Shubha', label: 'Shubha' },
+  { value: 'Rohshni', label: 'Rohshni' },
+  { value: 'Abhi', label: 'Abhi' },
+];
+
+
 
 export default class CreateMedicine extends Component {
   constructor(props) {
@@ -18,7 +30,12 @@ export default class CreateMedicine extends Component {
       description: '',
       quantity: 0,
       date: new Date(),
-      users: []
+      selectedOption: null,
+      users: [],
+      ignoreCase: false,
+    ignoreAccents: false,
+    trim: false,
+    matchFromStart: false
     }
   }
 
@@ -36,6 +53,12 @@ export default class CreateMedicine extends Component {
     console.log(error);
   })
   }
+
+  handleChange = selectedOption => {
+    this.setState({ selectedOption });
+    console.log(`Option selected:`, selectedOption);
+  };
+
 
   onChangeUsername(e) {
     this.setState({
@@ -80,26 +103,28 @@ export default class CreateMedicine extends Component {
   }
 
   render() {
+    const { selectedOption } = this.state;
+    const { ignoreCase, ignoreAccents, trim, matchFromStart } = this.state;
+
+    const filterConfig = {
+      ignoreCase,
+      ignoreAccents,
+      trim,
+      matchFrom: this.state.matchFromStart ? 'start' : 'any',
+    };
     return (
       <div>
         <h3>Create New Medicine Request</h3>
         <form onSubmit={this.onSubmit}>
           <div className="form-group"> 
             <label>Username: </label>
-            <select ref="userInput"
-                required
-                className="form-control"
-                value={this.state.username}
-                onChange={this.onChangeUsername}>
-                {
-                  this.state.users.map(function(user) {
-                    return <option 
-                      key={user}
-                      value={user}>{user}
-                      </option>;
-                  })
-                }
-            </select>
+            <Select
+            placeholder="Enter the username"
+            filterOption={createFilter(filterConfig)}
+            value={selectedOption}
+            onChange={this.handleChange}
+             options={options}
+      />
           </div>
           <div className="form-group"> 
             <label>Description: </label>
