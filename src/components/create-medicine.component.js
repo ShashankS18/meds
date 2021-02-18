@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import axios from 'axios';
 
 export default class CreateMedicine extends Component {
   constructor(props) {
@@ -22,10 +23,18 @@ export default class CreateMedicine extends Component {
   }
 
   componentDidMount() {
-    this.setState({ 
-      users: ['test user'],
-      username: 'test user'
-    });
+  axios.get('http://localhost:5000/users/')
+  .then(response => {
+    if (response.data.length > 0) {
+      this.setState({ 
+        users: response.data.map(user => user.username),
+        username: response.data[0].username
+      });
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+  })
   }
 
   onChangeUsername(e) {
@@ -58,13 +67,16 @@ export default class CreateMedicine extends Component {
     const medicine = {
       username: this.state.username,
       description: this.state.description,
-      quantity: this.state.duration,
+      quantity: this.state.quantity,
       date: this.state.date,
     };
   
     console.log(medicine);
+
+    axios.post('http://localhost:5000/medicines/add', medicine)
+  .then(res => console.log(res.data));
     
-    window.location = '/';
+    //window.location = '/';
   }
 
   render() {
